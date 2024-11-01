@@ -1,0 +1,35 @@
+.navbar-container {
+  background-color: #282c34;
+  width: 100%;
+  padding: 20px;
+  color: white;
+  text-align: center;
+}
+
+.navbar-container h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #61dafb;
+}
+
+.navbar-container ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.navbar-container li {
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-size: 18px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.navbar-container li:hover {
+  background-color: #61dafb;
+  color: #282c34;
+}
