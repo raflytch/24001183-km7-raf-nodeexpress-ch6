@@ -4,27 +4,16 @@ import viteLogo from "/vite.svg";
 import "./App.css";
 import NavbarWithStyling from "./components/NavbarWithStyling";
 
-function Navbar() {
-  return (
-    <div>
-      <h1>FSW 2</h1>
-      <ul>
-        <li>About Me</li>
-        <li>FAQ</li>
-        <li>Logout</li>
-      </ul>
-    </div>
-  );
-}
-
 function App() {
   const [count, setCount] = useState(0);
-  const listMenu = ["list", "About Me", "Logout"];
+  const menu = ["Menu", "About", "Logout"];
+  const name = ["Rafly"];
 
   return (
     <>
-      <NavbarWithStyling listMenu={listMenu} />
-      <Navbar />
+      <NavbarWithStyling menu={menu} name={name} />
+      <NavbarWithStyling name="Test" menu={menu} age="20" address="Jl. Raya" />
+      {/* <Navbar /> */}
       <div>
         <a href="https://vite.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
