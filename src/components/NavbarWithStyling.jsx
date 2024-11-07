@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 import { About } from "./About/About";
 import "./NavbarWithStyling.css";
 import { useNavbar } from "../hooks/UseNavbar";
+import { HoverButton } from "./Elements/button/HoverButton";
 
 function NavbarWithStyling({ menu, name, age, address }) {
   let List;
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [isModal, setIsModal] = useState(false);
 
   const {
     isToggle,
@@ -28,70 +31,79 @@ function NavbarWithStyling({ menu, name, age, address }) {
   } else {
     List = <h1>tidak ditemukan</h1>;
   }
+
+  function handleTriggerSelect(selectedStudent) {
+    console.log(`ini adalah handling punya ${selectedStudent}`);
+
+    setSelectedStudent(selectedStudent);
+    setIsModal(true);
+  }
+
+  function closeModal() {
+    setIsModal(false);
+  }
+
   return (
-    <>
-      <nav className="navbar-container">
+    <div className="card-container">
+      {/* Modal Component */}
+      {isModal && selectedStudent && (
+        <div className="overlay">
+          <div className="modal">
+            <div className="content">
+              <h2>Hello {selectedStudent.name}</h2>
+              <p>I am {selectedStudent.name}</p>
+              <p>My age is {selectedStudent.age}</p>
+              <p>My address is {selectedStudent.address}</p>
+            </div>
+            <button className="close-button" onClick={closeModal}>
+              &times;
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="card">
         <h1 className="navbar-title">FSW 2 {name}</h1>
-        <ul className="navbar-list">
+        <ul className="navbar-info">
           <li>{age}</li>
           <li>{address}</li>
         </ul>
+        <div className="navbar-separator" />
+
         {List}
 
-        <button
-          onClick={() => isClicked(!isClick)}
-          style={{
-            backgroundColor: isClick ? "red" : "green",
-            color: isClick ? "white" : "black",
-            padding: "10px 20px",
-            borderRadius: "5px",
-            border: "none",
-            cursor: "pointer",
-            transition: "all 0.3s ease",
-            display: "block",
-            margin: "0 auto",
-            marginTop: "20px",
-            marginBottom: "20px",
-          }}
-        >
-          {" "}
-          Click Me
-        </button>
+        <div className="navbar-buttons">
+          <button
+            onClick={() => isClicked(!isClick)}
+            className={`toggle-button ${isClick ? "active" : ""}`}
+          >
+            Click Me
+          </button>
 
-        <button
-          onClick={() => isActiveToggle(!isToggle)}
-          style={{
-            backgroundColor: isToggle ? "red" : "green",
-            color: isToggle ? "white" : "black",
-            padding: "10px 20px",
-            borderRadius: "5px",
-            border: "none",
-            cursor: "pointer",
-            transition: "all 0.3s ease",
-          }}
-        >
-          Hello click me on the button
-        </button>
-        <button onClick={() => isCount(count + 1)}> Count: {count} </button>
-        <input
-          type="text"
-          onChange={() => isFieldFilled(true)}
-          style={{
-            backgroundColor: isField ? "red" : "green",
-            color: isField ? "white" : "black",
-            padding: "10px 20px",
-            borderRadius: "5px",
-            border: "none",
-            cursor: "pointer",
-            transition: "all 0.3s ease",
-            display: "block",
-            margin: "0 auto",
-            marginTop: "20px",
-          }}
-        />
-      </nav>
+          <button
+            onClick={() => isActiveToggle(!isToggle)}
+            className={`toggle-button ${isToggle ? "active" : ""}`}
+          >
+            Hello click me on the button
+          </button>
+
+          <button onClick={() => isCount(count + 1)} className="count-button">
+            Count: {count}
+          </button>
+
+          <input
+            type="text"
+            onChange={() => isFieldFilled(true)}
+            className={`input-field ${isField ? "active" : ""}`}
+            placeholder="Type something..."
+          />
+        </div>
+      </div>
       <About children={name} age={age} address={address} />
-    </>
+      <HoverButton onSelect={() => handleTriggerSelect({ name, age, address })}>
+        Click Me
+      </HoverButton>
+    </div>
   );
 }
 
