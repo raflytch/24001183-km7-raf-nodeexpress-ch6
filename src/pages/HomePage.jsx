@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "../components/Elements/button/Button";
 import NavbarTailwind from "../components/Fragments/Navbar/NavbarTailwind";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 function HomePage() {
   const [shops, setShops] = useState([]);
@@ -11,14 +13,27 @@ function HomePage() {
   const [totalPages, setTotalPages] = useState(1);
   const [filter, setFilter] = useState("");
 
+  const navigate = useNavigate();
+
   const limit = 9;
 
   useEffect(() => {
+    const token = Cookies.get("token");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
     const fetchShops = async () => {
       setLoading(true);
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/v1/shops?limit=${limit}&page=${currentPage}&productName=${filter}`
+          `http://localhost:3000/api/v1/shops?limit=${limit}&page=${currentPage}&productName=${filter}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const data = response.data;
         if (data.isSuccess) {
@@ -33,7 +48,7 @@ function HomePage() {
     };
 
     fetchShops();
-  }, [currentPage, filter]);
+  }, [currentPage, filter, navigate]);
 
   const handleNextPage = (event) => {
     event.preventDefault();
@@ -73,35 +88,47 @@ function HomePage() {
           </p>
         ) : (
           <section className="max-w-6xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {shops.map((shop, index) => (
-              <div
-                key={index}
-                className="p-4 border rounded-md bg-white shadow-md"
-              >
-                <img
-                  src={shop.products[0].images[0]}
-                  alt={shop.products[0].name}
-                  className="w-full h-40 object-cover mb-4"
-                />
-                <h3 className="font-semibold text-blue-950">
-                  {shop.products[0].name}
-                </h3>
-                <p className="text-green-500 font-bold">
-                  Rp. {shop.products[0].price} / Hari
-                </p>
-                <p className="text-gray-600 mt-2 text-sm">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                </p>
-                <div className="flex items-center justify-between text-gray-500 text-sm mt-4">
-                  <span>4 orang</span>
-                  <span>Manual</span>
-                  <span>Tahun 2020</span>
+            {shops.length === 0 ? (
+              <p className="text-lg font-semibold text-gray-500 mt-10">
+                Data not found
+              </p>
+            ) : (
+              shops.map((shop, index) => (
+                <div
+                  key={index}
+                  className="p-4 border rounded-md bg-white shadow-md"
+                >
+                  <img
+                    src={shop.products[0].images[0]}
+                    alt={shop.products[0].name}
+                    className="w-full h-40 object-cover mb-4"
+                  />
+                  <h3 className="font-semibold text-blue-950">
+                    {shop.products[0].name}
+                  </h3>
+                  <p className="text-green-500 font-bold">
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    }).format(shop.products[0].price)}{" "}
+                    / Hari
+                  </p>
+                  <p className="text-gray-600 mt-2 text-sm">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  </p>
+                  <div className="flex items-center justify-between text-gray-500 text-sm mt-4">
+                    <span>4 orang</span>
+                    <span>Manual</span>
+                    <span>Tahun 2020</span>
+                  </div>
+                  <button className="w-full px-4 py-2 mt-4 text-white bg-green-500 rounded-md">
+                    Pilih Mobil
+                  </button>
                 </div>
-                <button className="w-full px-4 py-2 mt-4 text-white bg-green-500 rounded-md">
-                  Pilih Mobil
-                </button>
-              </div>
-            ))}
+              ))
+            )}
           </section>
         )}
 

@@ -1,11 +1,32 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 const NavbarTailwind = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = Cookies.get("token");
+
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = () => {
+    Cookies.remove("token");
+    setIsLoggedIn(false);
+    navigate("/login");
   };
 
   return (
@@ -23,20 +44,38 @@ const NavbarTailwind = () => {
               </Link>
             </li>
             <li>
-              <Link className="text-gray-700 hover:text-teal-600" to="/login">
-                Login
-              </Link>
+              {isLoggedIn ? (
+                <button
+                  className="text-gray-700 hover:text-teal-600"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              ) : (
+                <Link className="text-gray-700 hover:text-teal-600" to="/login">
+                  Login
+                </Link>
+              )}
             </li>
           </ul>
         </nav>
 
         <div className="flex items-center gap-4">
-          <Link
-            to="/login"
-            className="hidden md:block rounded-md bg-teal-600 px-5 py-2 text-sm font-medium text-white hover:bg-teal-700"
-          >
-            Login
-          </Link>
+          {isLoggedIn ? (
+            <button
+              onClick={handleLogout}
+              className="hidden md:block rounded-md bg-teal-600 px-5 py-2 text-sm font-medium text-white hover:bg-teal-700"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="hidden md:block rounded-md bg-teal-600 px-5 py-2 text-sm font-medium text-white hover:bg-teal-700"
+            >
+              Login
+            </Link>
+          )}
 
           <button
             className="md:hidden p-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -97,23 +136,37 @@ const NavbarTailwind = () => {
             </Link>
           </li>
           <li>
-            <Link
-              className="block text-gray-700 hover:bg-teal-100 rounded-md px-4 py-2"
-              to="/login"
-              onClick={toggleMenu}
-            >
-              Login
-            </Link>
+            {isLoggedIn ? (
+              <button
+                className="block w-full text-left text-gray-700 hover:bg-teal-100 rounded-md px-4 py-2"
+                onClick={() => {
+                  handleLogout();
+                  toggleMenu();
+                }}
+              >
+                Logout
+              </button>
+            ) : (
+              <Link
+                className="block text-gray-700 hover:bg-teal-100 rounded-md px-4 py-2"
+                to="/login"
+                onClick={toggleMenu}
+              >
+                Login
+              </Link>
+            )}
           </li>
-          <li>
-            <Link
-              className="block text-gray-700 hover:bg-teal-100 rounded-md px-4 py-2"
-              to="/register"
-              onClick={toggleMenu}
-            >
-              Register
-            </Link>
-          </li>
+          {!isLoggedIn && (
+            <li>
+              <Link
+                className="block text-gray-700 hover:bg-teal-100 rounded-md px-4 py-2"
+                to="/register"
+                onClick={toggleMenu}
+              >
+                Register
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
     </header>
