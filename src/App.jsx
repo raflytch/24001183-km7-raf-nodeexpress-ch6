@@ -1,27 +1,30 @@
 import { useEffect, useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import axios from "axios";
 import "./App.css";
 import NavbarWithStyling from "./components/navbarWithStyling";
+import { Button } from "./components/Elements/button/Button";
 
 function App() {
-  const [count, setCount] = useState(0);
-  const menu = ["Menu", "About", "Logout"];
-  const name = ["Rafly"];
-  const age = ["20"];
-
   const [shops, setShops] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [filter, setFilter] = useState("");
+
+  const limit = 9;
 
   useEffect(() => {
     const fetchShops = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get("http://localhost:3000/api/v1/shops");
+        const response = await axios.get(
+          `http://localhost:3000/api/v1/shops?limit=${limit}&page=${currentPage}&productName=${filter}`
+        );
         const data = response.data;
         if (data.isSuccess) {
           setShops(data.data.shops);
+          setTotalPages(data.data.totalPages);
         }
       } catch (error) {
         setError(error.message);
@@ -31,7 +34,22 @@ function App() {
     };
 
     fetchShops();
-  }, []);
+  }, [currentPage, filter]);
+
+  const handleNextPage = (event) => {
+    event.preventDefault();
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const handlePreviousPage = (event) => {
+    event.preventDefault();
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleFilterChange = (e) => {
+    setFilter(e.target.value);
+    setCurrentPage(1);
+  };
 
   return (
     <>
@@ -57,7 +75,16 @@ function App() {
           Register
         </button>
       </header>
-      <main className="text-center">
+
+      <main className="text-center mt-8">
+        <input
+          type="text"
+          value={filter}
+          onChange={handleFilterChange}
+          placeholder="Filter by product name"
+          className="mb-4 p-2 border rounded-md"
+        />
+
         {loading ? (
           <p className="text-lg font-semibold text-gray-500 mt-10">
             Loading...
@@ -99,6 +126,24 @@ function App() {
             ))}
           </section>
         )}
+
+        <div className="flex justify-center items-center mt-8">
+          <Button
+            handerAction={handlePreviousPage}
+            disabled={currentPage === 1}
+          >
+            Previous Page
+          </Button>
+          <p className="mx-4">
+            Page {currentPage} of {totalPages}
+          </p>
+          <Button
+            handerAction={handleNextPage}
+            disabled={currentPage === totalPages}
+          >
+            Next Page
+          </Button>
+        </div>
       </main>
     </>
   );
