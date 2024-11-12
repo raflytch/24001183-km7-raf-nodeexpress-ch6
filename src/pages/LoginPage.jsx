@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
+import Notification from "../components/Fragments/Notification";
 
 const LoginPageDefault = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationData, setNotificationData] = useState({});
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -20,25 +23,61 @@ const LoginPageDefault = () => {
 
       if (response.data.status === "Success") {
         const { token } = response.data.data[0];
-
         const decodedToken = jwtDecode(token);
-        console.log(decodedToken);
 
-        Cookies.set("token", token, decodedToken.id, {
+        Cookies.set("token", token, {
           expires: 7,
           secure: true,
           sameSite: "Strict",
         });
-        navigate("/");
+
+        setNotificationData({
+          message: "Login Successful",
+          description: "You have successfully logged in.",
+          type: "success",
+        });
+        setShowNotification(true);
+
+        setTimeout(() => {
+          navigate("/");
+          navigate(0);
+        }, 2000);
       } else {
-        setError(`Login failed. please try again ${response.data.status}`);
+        setError(`Login failed. Please try again ${response.data.status}`);
       }
     } catch (error) {
-      setError(error.response.data.message || error.message);
+      setError(error.response?.data?.message || error.message);
+      setNotificationData({
+        message: "Login Failed",
+        description: error.response?.data?.message || error.message,
+        type: "error",
+      });
+      setShowNotification(true);
+      console.log("Notification should show: ", showNotification);
     }
   };
+
+  useEffect(() => {
+    if (showNotification) {
+      const timer = setTimeout(() => {
+        setShowNotification(false);
+      }, 2000);
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  });
+
   return (
     <div>
+      {showNotification && (
+        <Notification
+          message={notificationData.message}
+          description={notificationData.description}
+          type={notificationData.type}
+          onClose={() => setShowNotification(false)}
+        />
+      )}
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img

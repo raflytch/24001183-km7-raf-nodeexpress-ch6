@@ -3,20 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 
-const NavbarTailwind = () => {
+const NavbarTailwind = ({ checkAuthentication }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!Cookies.get("token"));
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = Cookies.get("token");
-
-    if (token) {
-      const decodedToken = jwtDecode(token);
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
+    setIsLoggedIn(!!token);
   }, []);
 
   const toggleMenu = () => {
@@ -25,7 +19,7 @@ const NavbarTailwind = () => {
 
   const handleLogout = () => {
     Cookies.remove("token");
-    setIsLoggedIn(false);
+    checkAuthentication();
     navigate("/login");
   };
 

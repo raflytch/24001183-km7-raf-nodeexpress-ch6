@@ -67,8 +67,6 @@ function HomePage() {
 
   return (
     <>
-      <NavbarTailwind />
-
       <main className="text-center mt-8">
         <input
           type="text"
