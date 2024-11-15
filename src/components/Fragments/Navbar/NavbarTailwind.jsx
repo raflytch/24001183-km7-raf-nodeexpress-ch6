@@ -1,26 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
-const NavbarTailwind = ({ checkAuthentication }) => {
+const NavbarTailwind = ({ logout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(!!Cookies.get("token"));
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = Cookies.get("token");
-    setIsLoggedIn(!!token);
-  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleLogout = () => {
-    Cookies.remove("token");
-    checkAuthentication();
-    navigate("/login");
   };
 
   return (
@@ -38,38 +23,23 @@ const NavbarTailwind = ({ checkAuthentication }) => {
               </Link>
             </li>
             <li>
-              {isLoggedIn ? (
-                <button
-                  className="text-gray-700 hover:text-teal-600"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </button>
-              ) : (
-                <Link className="text-gray-700 hover:text-teal-600" to="/login">
-                  Login
-                </Link>
-              )}
+              <button
+                className="text-gray-700 hover:text-teal-600"
+                onClick={logout}
+              >
+                Logout
+              </button>
             </li>
           </ul>
         </nav>
 
         <div className="flex items-center gap-4">
-          {isLoggedIn ? (
-            <button
-              onClick={handleLogout}
-              className="hidden md:block rounded-md bg-teal-600 px-5 py-2 text-sm font-medium text-white hover:bg-teal-700"
-            >
-              Logout
-            </button>
-          ) : (
-            <Link
-              to="/login"
-              className="hidden md:block rounded-md bg-teal-600 px-5 py-2 text-sm font-medium text-white hover:bg-teal-700"
-            >
-              Login
-            </Link>
-          )}
+          <button
+            onClick={logout}
+            className="hidden md:block rounded-md bg-teal-600 px-5 py-2 text-sm font-medium text-white hover:bg-teal-700"
+          >
+            Logout
+          </button>
 
           <button
             className="md:hidden p-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -94,7 +64,6 @@ const NavbarTailwind = ({ checkAuthentication }) => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <div
         className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
@@ -130,37 +99,16 @@ const NavbarTailwind = ({ checkAuthentication }) => {
             </Link>
           </li>
           <li>
-            {isLoggedIn ? (
-              <button
-                className="block w-full text-left text-gray-700 hover:bg-teal-100 rounded-md px-4 py-2"
-                onClick={() => {
-                  handleLogout();
-                  toggleMenu();
-                }}
-              >
-                Logout
-              </button>
-            ) : (
-              <Link
-                className="block text-gray-700 hover:bg-teal-100 rounded-md px-4 py-2"
-                to="/login"
-                onClick={toggleMenu}
-              >
-                Login
-              </Link>
-            )}
+            <button
+              className="block w-full text-left text-gray-700 hover:bg-teal-100 rounded-md px-4 py-2"
+              onClick={() => {
+                logout();
+                toggleMenu();
+              }}
+            >
+              Logout
+            </button>
           </li>
-          {!isLoggedIn && (
-            <li>
-              <Link
-                className="block text-gray-700 hover:bg-teal-100 rounded-md px-4 py-2"
-                to="/register"
-                onClick={toggleMenu}
-              >
-                Register
-              </Link>
-            </li>
-          )}
         </ul>
       </div>
     </header>

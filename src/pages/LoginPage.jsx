@@ -1,72 +1,29 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
-import Cookies from "js-cookie";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import Notification from "../components/Fragments/Notification";
+import { useAuth } from "../context/AuthContext";
 
 const LoginPageDefault = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [showNotification, setShowNotification] = useState(false);
-  const [notificationData, setNotificationData] = useState({});
-  const navigate = useNavigate();
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/auth/login",
-        { email, password }
-      );
-
-      if (response.data.status === "Success") {
-        const { token } = response.data.data[0];
-        const decodedToken = jwtDecode(token);
-
-        Cookies.set("token", token, {
-          expires: 7,
-          secure: true,
-          sameSite: "Strict",
-        });
-
-        setNotificationData({
-          message: "Login Successful",
-          description: "You have successfully logged in.",
-          type: "success",
-        });
-        setShowNotification(true);
-
-        setTimeout(() => {
-          navigate("/");
-          navigate(0);
-        }, 2000);
-      } else {
-        setError(`Login failed. Please try again ${response.data.status}`);
-      }
-    } catch (error) {
-      setError(error.response?.data?.message || error.message);
-      setNotificationData({
-        message: "Login Failed",
-        description: error.response?.data?.message || error.message,
-        type: "error",
-      });
-      setShowNotification(true);
-      console.log("Notification should show: ", showNotification);
-    }
-  };
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    error,
+    showNotification,
+    setShowNotification,
+    notificationData,
+    handleLogin,
+  } = useAuth();
 
   useEffect(() => {
     if (showNotification) {
       const timer = setTimeout(() => {
         setShowNotification(false);
       }, 2000);
-      return () => {
-        clearTimeout(timer);
-      };
+      return () => clearTimeout(timer);
     }
-  });
+  }, [showNotification, setShowNotification]);
 
   return (
     <div>
@@ -108,6 +65,7 @@ const LoginPageDefault = () => {
                   autoComplete="email"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                   onChange={(e) => setEmail(e.target.value)}
+                  value={email}
                 />
               </div>
             </div>
@@ -138,6 +96,7 @@ const LoginPageDefault = () => {
                   autoComplete="current-password"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
                   onChange={(e) => setPassword(e.target.value)}
+                  value={password}
                 />
               </div>
             </div>

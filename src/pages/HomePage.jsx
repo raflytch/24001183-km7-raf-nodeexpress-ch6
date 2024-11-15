@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Button } from "../components/Elements/button/Button";
 import NavbarTailwind from "../components/Fragments/Navbar/NavbarTailwind";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import axiosInstance from "../api/axiosInstance";
 
 function HomePage() {
   const [shops, setShops] = useState([]);
@@ -24,16 +24,12 @@ function HomePage() {
       navigate("/login");
       return;
     }
+
     const fetchShops = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(
-          `http://localhost:3000/api/v1/shops?limit=${limit}&page=${currentPage}&productName=${filter}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const response = await axiosInstance.get(
+          `/shops?limit=${limit}&page=${currentPage}&productName=${filter}`
         );
         const data = response.data;
         if (data.isSuccess) {

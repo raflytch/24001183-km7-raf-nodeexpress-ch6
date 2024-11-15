@@ -1,52 +1,33 @@
 import "./App.css";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useNavigate,
-  Navigate,
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPageDefault from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
-import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
 import NavbarTailwind from "./components/Fragments/Navbar/NavbarTailwind";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // Check ada user atau ga
-
-  const checkAuthenticated = () => {
-    const token = Cookies.get("token");
-    setIsAuthenticated(!!token);
-  };
-  useEffect(() => {
-    checkAuthenticated();
-  }, []);
+  const { isAuthenticated, logout } = useAuth();
 
   return (
-    <Router>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            isAuthenticated ? (
-              <>
-                <NavbarTailwind checkAuthentication={checkAuthenticated} />
-                <HomePage />
-              </>
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
-        <Route
-          path="/login"
-          element={isAuthenticated ? <Navigate to="/" /> : <LoginPageDefault />}
-        />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          isAuthenticated ? (
+            <>
+              <NavbarTailwind logout={logout} />
+              <HomePage />
+            </>
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+      <Route
+        path="/login"
+        element={isAuthenticated ? <Navigate to="/" /> : <LoginPageDefault />}
+      />
+    </Routes>
   );
 }
 
